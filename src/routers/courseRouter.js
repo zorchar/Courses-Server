@@ -1,24 +1,19 @@
 const express = require('express')
-const studentControllers = require('../controllers/studentControllers')
+const courseControllers = require('../controllers/courseControllers')
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
-
 const router = new express.Router()
 
-router.post('/signin', studentControllers.signInStudent)
+router.post('/create', authProfessor, courseControllers.createCourse)
 
-router.post('/create', authProfessor, studentControllers.createStudent)
+// router.post('/register', authProfessor, courseControllers.registerForCourse)
 
-router.get('/', studentControllers.getAllStudents)
+router.delete('/:courseName', authProfessor, courseControllers.deleteCourse)
 
-router.get('/:studentId', authProfessor, studentControllers.getStudent)
+router.get('/', courseControllers.getAllCourses)
 
-router.delete('/:studentId', authProfessor, studentControllers.deleteStudent)
-
-router.patch('/me', authStudent, studentControllers.patchStudent)
-
-router.post('/register', authProfessor, studentControllers.registerForCourse)
+// router.get('/:courseId', courseControllers.getCourse)
 
 router.use((req, res, next) => {
     if (res.locals.data)

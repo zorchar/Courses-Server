@@ -42,6 +42,20 @@ const studentSchema = new mongoose.Schema(
             trim: true,
             // minlength: 8,
         },
+        courses: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Course'
+            }
+        ],
+        tokens: [
+            {
+                token: {
+                    type: String,
+                    required: true,
+                }
+            }
+        ]
     },
     {
         timestamps: true
@@ -52,7 +66,7 @@ studentSchema.pre('save', async function (next) {
     const student = this
     if (student.isModified('password')) {
         // const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{0,}$/
-        // if (!passRegex.test(student.password) /*|| user.password.length < 8*/) {
+        // if (!passRegex.test(student.password) /*|| student.password.length < 8*/) {
         //     throw new Error('password must contain... and have 8 chars or more')
         // }
         student.password = await bcrypt.hash(student.password, 8)
@@ -60,14 +74,49 @@ studentSchema.pre('save', async function (next) {
     next()
 })
 
+studentSchema.statics.findStudentByEmailAndPassword = async (email, password) => {
+    const student = await Student.findOne({ email })
+    if (!student) {
+        const err = new Error('Unable to login.')
+        err.status = 400
+        throw err
+    }
+
+    const isPassMatch = await bcrypt.compare(password, student.password)
+    if (!isPassMatch) {
+        const err = new Error('Unable to login.')
+        err.status = 400
+        throw err
+    }
+
+    return student
+}
+
+studentSchema.methods.generateToken = async function () {
+    const student = this
+    const token = jwt.sign(
+        {
+            _id: student._id
+        },
+        process.env.SECRET,
+        {
+            expiresIn: '6h'
+        }
+    )
+    student.tokens = student.tokens.concat({ token })
+    await student.save()
+
+    return token
+}
+
 studentSchema.methods.toJSON = function () {
-    const user = this
-    const userObj = user.toObject()
+    const student = this
+    const studentObj = student.toObject()
 
-    delete userObj.password
-    delete userObj.tokens
+    delete studentObj.password
+    delete studentObj.tokens
 
-    return userObj
+    return studentObj
 }
 
 const Student = mongoose.model("Student", studentSchema)

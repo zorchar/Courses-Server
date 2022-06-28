@@ -42,6 +42,14 @@ const professorSchema = new mongoose.Schema(
             trim: true,
             // minlength: 8,
         },
+        tokens: [
+            {
+                token: {
+                    type: String,
+                    required: true,
+                }
+            }
+        ]
     },
     {
         timestamps: true
@@ -52,7 +60,7 @@ professorSchema.pre('save', async function (next) {
     const professor = this
     if (professor.isModified('password')) {
         // const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{0,}$/
-        // if (!passRegex.test(professor.password) /*|| user.password.length < 8*/) {
+        // if (!passRegex.test(professor.password) /*|| professor.password.length < 8*/) {
         //     throw new Error('password must contain... and have 8 chars or more')
         // }
         professor.password = await bcrypt.hash(professor.password, 8)
@@ -60,14 +68,49 @@ professorSchema.pre('save', async function (next) {
     next()
 })
 
+professorSchema.statics.findProfessorByEmailAndPassword = async (email, password) => {
+    const professor = await Professor.findOne({ email })
+    if (!professor) {
+        const err = new Error('Unable to login.')
+        err.status = 400
+        throw err
+    }
+
+    const isPassMatch = await bcrypt.compare(password, professor.password)
+    if (!isPassMatch) {
+        const err = new Error('Unable to login.')
+        err.status = 400
+        throw err
+    }
+
+    return professor
+}
+
+professorSchema.methods.generateToken = async function () {
+    const professor = this
+    const token = jwt.sign(
+        {
+            _id: professor._id
+        },
+        process.env.SECRET,
+        {
+            expiresIn: '6h'
+        }
+    )
+    professor.tokens = professor.tokens.concat({ token })
+    await professor.save()
+
+    return token
+}
+
 professorSchema.methods.toJSON = function () {
-    const user = this
-    const userObj = user.toObject()
+    const professor = this
+    const professorObj = professor.toObject()
 
-    delete userObj.password
-    delete userObj.tokens
+    delete professorObj.password
+    delete professorObj.tokens
 
-    return userObj
+    return professorObj
 }
 
 const Professor = mongoose.model("Professor", professorSchema)
