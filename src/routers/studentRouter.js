@@ -14,11 +14,13 @@ router.get('/', studentControllers.getAllStudents)
 
 router.get('/:studentId', authProfessor, studentControllers.getStudent)
 
-router.delete('/:studentId', authProfessor, studentControllers.deleteStudent)
+router.delete('/:studentId', authProfessor, studentControllers.deleteStudent)//can maybe pipeline remove from course
 
 router.patch('/me', authStudent, studentControllers.patchStudent)
 
-router.post('/register', authProfessor, studentControllers.registerForCourse)
+router.patch('/register', authProfessor, studentControllers.registerForCourse)
+
+router.patch('/unregister', authProfessor, studentControllers.removeFromCourse)
 
 router.use((req, res, next) => {
     if (res.locals.data)

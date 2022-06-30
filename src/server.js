@@ -8,6 +8,7 @@ require('./db/mongoose')
 const studentRouter = require('./routers/studentRouter')
 const professorRouter = require('./routers/professorRouter')
 const courseRouter = require('./routers/courseRouter')
+const absenceRouter = require('./routers/absenceRouter')
 
 // const publicDirectoryPath = path.join(__dirname, '../public')
 
@@ -19,6 +20,8 @@ app.use(express.json())
 app.use('/professors', professorRouter)//change
 app.use('/students', studentRouter)
 app.use('/courses', courseRouter)
+app.use('/absences', absenceRouter)
+
 
 app.use((req, res, next) => {
     return res.send('ok')

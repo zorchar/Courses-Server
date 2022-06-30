@@ -1,19 +1,15 @@
 const express = require('express')
-const courseControllers = require('../controllers/courseControllers')
+const absenceControllers = require('../controllers/absenceControllers')
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
 const router = new express.Router()
 
-router.post('/create', authProfessor, courseControllers.createCourse)
+// router.post('/create', authProfessor, absenceControllers.createAbsence)
 
-router.delete('/:courseName', authProfessor, courseControllers.deleteCourse)
+// router.delete('/delete', authProfessor, absenceControllers.deleteAbsence)
 
-router.get('/', courseControllers.getAllCourses)
-
-// router.get('/:studentId', authStudent, courseControllers.getCoursesOfStudent)
-
-// router.get('/:courseId', courseControllers.getCourse)
+router.patch('/add-reason', absenceControllers.addReasonToAbsence)
 
 router.use((req, res, next) => {
     if (res.locals.data)
@@ -22,6 +18,7 @@ router.use((req, res, next) => {
 })
 
 router.use((error, req, res, next) => {
+    console.log(error);
     res.status(500).send({
         status: 500,
         message: error.message

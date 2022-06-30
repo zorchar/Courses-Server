@@ -8,6 +8,7 @@ const patchDocument = async (Model, documentId, data) => {
         await document.save()
         return document
     } catch (error) {
+        throw error
     }
 }
 
@@ -15,6 +16,7 @@ const deleteDocument = async (Model, documentFilter) => {
     try {
         return await Model.deleteOne(documentFilter)
     } catch (error) {
+        throw error
     }
 }
 

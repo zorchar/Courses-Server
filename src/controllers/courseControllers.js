@@ -20,22 +20,6 @@ const createCourse = async (req, res, next) => {
     }
 }
 
-// const registerForCourse = async (req, res, next) => {
-//     try {
-//         const course = await Course.findOne({ name: req.body.courseName })
-//         if (course.students.includes(req.body.studentId))
-//             throw { message: 'Student already registered.' }
-//         course.students = course.students.concat(req.body.studentId)
-//         const data = await course.save()
-
-//         res.locals.data = data
-//         res.locals.status = 201
-//         next()
-//     } catch (error) {
-//         next(error)
-//     }
-// }
-
 const deleteCourse = async (req, res, next) => {
     try {
         const deletedCount = await deleteDocument(Course, { name: req.params.courseName })
@@ -59,11 +43,13 @@ const getAllCourses = async (req, res, next) => {
     }
 }
 
-// const getCourse = async (req, res, next) => {
+// const getCoursesOfStudent = async (req, res, next) => {
+//     const studentId = req.params.studentId
 //     try {
-//         const data = await Course.findOne({ _id: req.params.courseId })
+//         const data = await Course.find({ students: studentId }).populate('professor', 'firstName') // maybe remove professor populate
+//         console.log(data);
 //         res.locals.data = data
-//         res.locals.status = 200
+//         res.locals.status = 201
 //         next()
 //     } catch (error) {
 //         next(error)
@@ -74,5 +60,6 @@ module.exports = {
     createCourse,
     getAllCourses,
     deleteCourse,
+    // getCoursesOfStudent
     // registerForCourse
 }

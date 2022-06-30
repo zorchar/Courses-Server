@@ -3,10 +3,11 @@ const Professor = require('../models/professorModel')
 
 const authProfessor = async (req, res, next) => {
     try {
-        const token = req.header('Authorization').replace('Bearer ', '')
+        const token = req.get('Authorization').replace('Bearer ', '')
         const data = jwt.verify(token, process.env.SECRET)
         const professor = await Professor.findOne(
             {
+
                 _id: data._id,
                 'tokens.token': token
             }
