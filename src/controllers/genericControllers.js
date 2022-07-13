@@ -20,7 +20,16 @@ const deleteDocument = async (Model, documentFilter) => {
     }
 }
 
+const deleteDocuments = async (Model, documentFilter) => {
+    try {
+        return await Model.deleteMany(documentFilter)
+    } catch (error) {
+        throw error
+    }
+}
+
 module.exports = {
     patchDocument,
-    deleteDocument
+    deleteDocument,
+    deleteDocuments
 }

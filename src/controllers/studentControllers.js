@@ -1,13 +1,16 @@
+const { findOneAndUpdate } = require("../models/absenceModel");
 const Absence = require("../models/absenceModel");
 const Course = require("../models/courseModel");
 const Student = require("../models/studentModel");
 const { concatObjectIdToFieldInDocument, removeObjectIdFromFieldInDocument } = require("../utils/generalUtils");
-const { patchDocument, deleteDocument } = require("./genericControllers")
+const { patchDocument, deleteDocument, deleteDocuments } = require("./genericControllers")
 
 const signInStudent = async (req, res, next) => {
+    const { email, password } = req.body
     try {
-        const student = await Student.findStudentByEmailAndPassword(req.body.email, req.body.password)
+        const student = await Student.findStudentByEmailAndPassword(email, password)
         const token = await student.generateToken()
+
         res.locals.data = { user: student, token }
         res.locals.status = 200
         next()
@@ -20,6 +23,7 @@ const createStudent = async (req, res, next) => {
     const student = new Student(req.body)
     try {
         const data = await student.save()
+
         res.locals.data = data
         res.locals.status = 201
         next()
@@ -31,6 +35,7 @@ const createStudent = async (req, res, next) => {
 const getStudent = async (req, res, next) => {
     try {
         const data = await Student.findOne({ _id: req.params.studentId }).populate('courses')
+
         res.locals.data = data
         res.locals.status = 200
         next()
@@ -42,6 +47,7 @@ const getStudent = async (req, res, next) => {
 const getAllStudents = async (req, res, next) => {
     try {
         const data = await Student.find()
+
         res.locals.data = data
         res.locals.status = 200
         next()
@@ -53,6 +59,7 @@ const getAllStudents = async (req, res, next) => {
 const patchStudent = async (req, res, next) => {
     try {
         const patchedStudent = await patchDocument(Student, req.body.userId, req.body)
+
         res.locals.data = patchedStudent
         res.locals.status = 200
         next()
@@ -62,8 +69,23 @@ const patchStudent = async (req, res, next) => {
 }
 
 const deleteStudent = async (req, res, next) => {
+    const { studentId } = req.params
     try {
-        const deletedCount = await deleteDocument(Student, { _id: req.params.studentId })
+        const coursesWhereStudentIsRegistered = await Course.find({ students: studentId })
+        coursesWhereStudentIsRegistered.forEach((course) => {
+            course.students.forEach((student, i) => {
+                if (student.toString() === studentId)
+                    course.students.splice(i, 1)
+            })
+        })
+        console.log(coursesWhereStudentIsRegistered);
+        coursesWhereStudentIsRegistered.forEach(course => {
+            course.save()
+        })
+
+        const deletedCount = await deleteDocument(Student, { _id: studentId })
+        await deleteDocuments(Absence, { student: studentId })
+
         res.locals.data = deletedCount
         res.locals.status = 200
         next()
@@ -103,8 +125,7 @@ const registerForCourse = async (req, res, next) => {
 const removeFromCourse = async (req, res, next) => {
     try {
         const data = {}
-        const courseId = req.body.courseId
-        const studentId = req.body.studentId
+        const { courseId, studentId } = req.body
 
         await deleteDocument(Absence, { course: courseId, student: studentId })
 
@@ -130,5 +151,5 @@ module.exports = {
     signInStudent,
     deleteStudent,
     registerForCourse,
-    removeFromCourse
+    removeFromCourse,
 }

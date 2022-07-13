@@ -40,7 +40,7 @@ const studentSchema = new mongoose.Schema(
             type: String,
             required: [true, 'password is required'],
             trim: true,
-            // minlength: 8,
+            minlength: 8,
         },
         courses: [
             {
@@ -55,7 +55,7 @@ const studentSchema = new mongoose.Schema(
                     required: true,
                 }
             }
-        ]
+        ],
     },
     {
         timestamps: true
@@ -65,10 +65,10 @@ const studentSchema = new mongoose.Schema(
 studentSchema.pre('save', async function (next) {
     const student = this
     if (student.isModified('password')) {
-        // const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{0,}$/
-        // if (!passRegex.test(student.password) /*|| student.password.length < 8*/) {
-        //     throw new Error('password must contain... and have 8 chars or more')
-        // }
+        const passRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{0,}$/
+        if (!passRegex.test(student.password) /*|| student.password.length < 8*/) {
+            throw new Error('password must contain upper case, lower case, numbers, and have 8 chars or more')
+        }
         student.password = await bcrypt.hash(student.password, 8)
     }
     next()

@@ -1,40 +1,28 @@
 const Absence = require("../models/absenceModel")
-// const Course = require("../models/courseModel")
-const { deleteDocument } = require("./genericControllers")
-
-// const createAbsence = async (req, res, next) => {
-//     const { courseId, studentId } = req.body
-//     try {
-//         const course = await Course.findOne({ _id: courseId })
-//         const absence = new Absence(
-//             {
-//                 course: courseId,
-//                 student: studentId,
-//                 absences: course.schedule
-//             }
-//         )
-//         const data = await absence.save()
-//         res.locals.data = data
-//         res.locals.status = 201
-//         next()
-//     } catch (error) {
-//         next(error)
-//     }
-// }
 
 const addReasonToAbsence = async (req, res, next) => {
-    const { studentId, courseId, reason, classDate } = req.body
+    const { studentId, courseId, reason, classDate, isAttended } = req.body
     try {
         const absence = await Absence.findOne({ student: studentId, course: courseId })
 
-        const sameDateReasons = absence.reasons.filter(reason => reason.classDate.toString() === classDate.toString())/// make sure it works after change to classDate
-        if (sameDateReasons.length > 0)
-            throw ('Absence reason already exists for this class')
+        const sameDateReasons = absence.reasons.filter(reason => new Date(reason.classDate).toString() === new Date(classDate).toString())
 
-        absence.reasons = absence.reasons.concat({
-            reason,
-            classDate: absence.absences[0]
-        })
+        // redundency check - no two reasons can exist on the same date
+        if (sameDateReasons.length === 0)
+            absence.reasons = absence.reasons.concat({
+                reason,
+                classDate
+            })
+        else {
+            absence.reasons.forEach((reasonElement, i) => {
+                if (new Date(reasonElement.classDate).toString() === new Date(classDate).toString())
+                    if (isAttended)
+                        absence.reasons.splice(i, 1)
+                    else
+                        absence.reasons[i].reason = reason
+            })
+        }
+
         const data = await absence.save()
 
         res.locals.data = data
@@ -45,20 +33,46 @@ const addReasonToAbsence = async (req, res, next) => {
     }
 }
 
-// const deleteAbsence = async (req, res, next) => {
-//     const { courseId, studentId } = req.body
-//     try {
-//         const deletedCount = await deleteDocument(Absence, { course: courseId, student: studentId })
-//         res.locals.data = deletedCount
-//         res.locals.status = 200
-//         next()
-//     } catch (error) {
-//         next(error)
-//     }
-// }
+const getReasonFromAbsence = async (req, res, next) => {
+    const { studentId, courseId, classDate } = req.body
+    try {
+        const absence = await Absence.findOne({ student: studentId, course: courseId })
+        const absenceStatus = {}
+
+        const sameDateReasons = absence.reasons.filter(reason => new Date(reason.classDate).toString() === new Date(classDate).toString())/// make sure it works after change to classDate
+        if (sameDateReasons.length === 1) {
+            absenceStatus.reason = sameDateReasons[0].reason
+            absenceStatus.isAttended = false
+        }
+        else {
+            absenceStatus.reason = ''
+            absenceStatus.isAttended = true
+        }
+        res.locals.data = absenceStatus
+        res.locals.status = 201
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
+
+const getAbsencesOfDateAndCourse = async (req, res, next) => {
+    const { courseId, classDate } = req.body
+    try {
+        const absences = await Absence.find({ 'reasons.classDate': new Date(classDate), course: courseId })
+
+        res.locals.data = absences
+        res.locals.status = 201
+        next()
+    } catch (error) {
+        next(error)
+    }
+}
 
 module.exports = {
     // createAbsence,
     // deleteAbsence,
-    addReasonToAbsence
+    addReasonToAbsence,
+    getReasonFromAbsence,
+    getAbsencesOfDateAndCourse
 }

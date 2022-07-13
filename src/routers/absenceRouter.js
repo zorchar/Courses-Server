@@ -11,6 +11,10 @@ const router = new express.Router()
 
 router.patch('/add-reason', absenceControllers.addReasonToAbsence)
 
+router.put('/get-reason', absenceControllers.getReasonFromAbsence)
+
+router.put('/get-absences-course-and-date', absenceControllers.getAbsencesOfDateAndCourse)
+
 router.use((req, res, next) => {
     if (res.locals.data)
         return res.status(res.locals.status || 200).send({ status: "success", data: res.locals.data })
@@ -18,10 +22,9 @@ router.use((req, res, next) => {
 })
 
 router.use((error, req, res, next) => {
-    console.log(error);
     res.status(500).send({
         status: 500,
-        message: error.message
+        message: error
     })
 })
 

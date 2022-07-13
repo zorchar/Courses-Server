@@ -1,6 +1,7 @@
+const Absence = require("../models/absenceModel")
 const Course = require("../models/courseModel")
 const { createSchedule } = require("../utils/courseUtils")
-const { patchDocument, deleteDocument } = require("./genericControllers")
+const { patchDocument, deleteDocument, deleteDocuments } = require("./genericControllers")
 
 const createCourse = async (req, res, next) => {
     const course = new Course(req.body)
@@ -21,8 +22,12 @@ const createCourse = async (req, res, next) => {
 }
 
 const deleteCourse = async (req, res, next) => {
+    const { courseName } = req.params
     try {
-        const deletedCount = await deleteDocument(Course, { name: req.params.courseName })
+        const course = await Course.findOne({ name: courseName })
+        await deleteDocuments(Absence, { course: course._id })
+        const deletedCount = await deleteDocument(Course, { name: courseName })
+
         res.locals.data = deletedCount
         res.locals.status = 200
         next()
@@ -33,7 +38,7 @@ const deleteCourse = async (req, res, next) => {
 
 const getAllCourses = async (req, res, next) => {
     try {
-        const data = await Course.find().populate('professor', 'firstName')
+        const data = await Course.find().populate('professor')
         // const data = await Course.find()
         res.locals.data = data
         res.locals.status = 201
