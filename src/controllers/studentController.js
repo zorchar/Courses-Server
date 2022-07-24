@@ -3,7 +3,7 @@ const Absence = require("../models/absenceModel");
 const Course = require("../models/courseModel");
 const Student = require("../models/studentModel");
 const { concatObjectIdToFieldInDocument, removeObjectIdFromFieldInDocument } = require("../utils/generalUtils");
-const { patchDocument, deleteDocument, deleteDocuments } = require("./genericControllers")
+const { patchDocument, deleteDocument, deleteDocuments } = require("./genericController")
 
 const signInStudent = async (req, res, next) => {
     const { email, password } = req.body
@@ -124,6 +124,7 @@ const registerForCourse = async (req, res, next) => {
 
 const removeFromCourse = async (req, res, next) => {
     try {
+        console.log(true)
         const data = {}
         const { courseId, studentId } = req.body
 
@@ -139,6 +140,7 @@ const removeFromCourse = async (req, res, next) => {
         res.locals.status = 201
         next()
     } catch (error) {
+        console.log(error)
         next(error)
     }
 }

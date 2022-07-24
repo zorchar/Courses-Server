@@ -1,7 +1,7 @@
 const Absence = require("../models/absenceModel")
 const Course = require("../models/courseModel")
 const { createSchedule } = require("../utils/courseUtils")
-const { patchDocument, deleteDocument, deleteDocuments } = require("./genericControllers")
+const { patchDocument, deleteDocument, deleteDocuments } = require("./genericController")
 
 const createCourse = async (req, res, next) => {
     const course = new Course(req.body)

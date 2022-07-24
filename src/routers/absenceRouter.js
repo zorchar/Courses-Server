@@ -1,31 +1,14 @@
 const express = require('express')
-const absenceControllers = require('../controllers/absenceControllers')
+const absenceController = require('../controllers/absenceController')
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
 const router = new express.Router()
 
-// router.post('/create', authProfessor, absenceControllers.createAbsence)
+router.patch('/add-reason', authStudent, absenceController.addReasonToAbsence)
 
-// router.delete('/delete', authProfessor, absenceControllers.deleteAbsence)
+router.put('/get-reason', absenceController.getReasonFromAbsence)
 
-router.patch('/add-reason', absenceControllers.addReasonToAbsence)
-
-router.put('/get-reason', absenceControllers.getReasonFromAbsence)
-
-router.put('/get-absences-course-and-date', absenceControllers.getAbsencesOfDateAndCourse)
-
-router.use((req, res, next) => {
-    if (res.locals.data)
-        return res.status(res.locals.status || 200).send({ status: "success", data: res.locals.data })
-    next({ status: 500, message: 'path does not exist' })
-})
-
-router.use((error, req, res, next) => {
-    res.status(500).send({
-        status: 500,
-        message: error
-    })
-})
+router.put('/get-absences-course-and-date', absenceController.getAbsencesOfDateAndCourse)
 
 module.exports = router

@@ -1,5 +1,5 @@
 const Professor = require("../models/professorModel")
-const { patchDocument } = require("./genericControllers")
+const { patchDocument } = require("./genericController")
 
 const patchProfessor = async (req, res, next) => {
     try {

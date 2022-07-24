@@ -25,6 +25,7 @@ const authProfessor = async (req, res, next) => {
     } catch (error) {
         error.status = 401
         error.message = 'no authentication'
+        console.log(error)
         return next(error)
     }
 }

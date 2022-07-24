@@ -1,31 +1,14 @@
 const express = require('express')
-const courseControllers = require('../controllers/courseControllers')
+const courseController = require('../controllers/courseController')
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
 const router = new express.Router()
 
-router.post('/create', authProfessor, courseControllers.createCourse)
+router.post('/create', authProfessor, courseController.createCourse)
 
-router.delete('/:courseName', authProfessor, courseControllers.deleteCourse)
+router.delete('/:courseName', authProfessor, courseController.deleteCourse)
 
-router.get('/', courseControllers.getAllCourses)
-
-// router.get('/:studentId', authStudent, courseControllers.getCoursesOfStudent)
-
-// router.get('/:courseId', courseControllers.getCourse)
-
-router.use((req, res, next) => {
-    if (res.locals.data)
-        return res.status(res.locals.status || 200).send({ status: "success", data: res.locals.data })
-    next({ status: 500, message: 'path does not exist' })
-})
-
-router.use((error, req, res, next) => {
-    res.status(500).send({
-        status: 500,
-        message: error.message
-    })
-})
+router.get('/', courseController.getAllCourses)
 
 module.exports = router

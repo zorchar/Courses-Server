@@ -1,38 +1,24 @@
 const express = require('express')
-const studentControllers = require('../controllers/studentControllers')
+const studentController = require('../controllers/studentController')
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
-
 const router = new express.Router()
 
-router.post('/signin', studentControllers.signInStudent)
+router.post('/signin', studentController.signInStudent)
 
-router.post('/create', authProfessor, studentControllers.createStudent)
+router.post('/create', authProfessor, studentController.createStudent)
 
-router.get('/', studentControllers.getAllStudents)
+router.get('/', studentController.getAllStudents)
 
-router.get('/:studentId', authProfessor, studentControllers.getStudent)
+router.get('/:studentId', authProfessor, studentController.getStudent)
 
-router.delete('/:studentId', authProfessor, studentControllers.deleteStudent)//can maybe pipeline remove from course
+router.delete('/:studentId', authProfessor, studentController.deleteStudent)
 
-router.patch('/me', authStudent, studentControllers.patchStudent)
+router.patch('/me', authStudent, studentController.patchStudent)
 
-router.patch('/register', authProfessor, studentControllers.registerForCourse)
+router.patch('/register', authProfessor, studentController.registerForCourse)
 
-router.patch('/unregister', authProfessor, studentControllers.removeFromCourse)
-
-router.use((req, res, next) => {
-    if (res.locals.data)
-        return res.status(res.locals.status || 200).send({ status: "success", data: res.locals.data })
-    next({ status: 500, message: 'path does not exist' })
-})
-
-router.use((error, req, res, next) => {
-    res.status(500).send({
-        status: 500,
-        message: error.message
-    })
-})
+router.patch('/unregister', authProfessor, studentController.removeFromCourse)
 
 module.exports = router

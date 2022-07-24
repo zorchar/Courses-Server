@@ -22,14 +22,16 @@ app.use('/students', studentRouter)
 app.use('/courses', courseRouter)
 app.use('/absences', absenceRouter)
 
-
 app.use((req, res, next) => {
-    return res.send('ok')
+    return res.status(res.locals.status || 200).send({ status: "success", data: res.locals.data })
 })
 
-// app.all("*", (req, res) => {
-//     res.status(400).render('error-page')
-// })
+app.use((error, req, res, next) => {
+    res.status(500).send({
+        status: 500,
+        message: error.message
+    })
+})
 
 app.listen(port, () => {
     console.log('Server connected, port:', port)
