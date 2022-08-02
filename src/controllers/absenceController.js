@@ -36,6 +36,7 @@ const addReasonToAbsence = async (req, res, next) => {
 
 const getReasonFromAbsence = async (req, res, next) => {
     const { studentId, courseId, classDate } = req.body
+
     try {
         const absence = await Absence.findOne({ student: studentId, course: courseId })
 
@@ -63,6 +64,7 @@ const getReasonFromAbsence = async (req, res, next) => {
 
 const getAbsencesOfDateAndCourse = async (req, res, next) => {
     const { courseId, classDate } = req.body
+
     try {
         const absences = await Absence.find({ 'reasons.classDate': new Date(classDate), course: courseId })
 

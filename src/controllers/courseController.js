@@ -34,7 +34,7 @@ const deleteCourse = async (req, res, next) => {
         deletedCount.deletedAbsences = await deleteDocuments(Absence, { course: course._id })
 
         res.locals.data = deletedCount
-        res.locals.status = 200
+        res.locals.status = 204
         next()
     } catch (error) {
         next(error)
@@ -118,7 +118,7 @@ const removeFromCourse = async (req, res, next) => {
         await data.student.save()
 
         res.locals.data = data
-        res.locals.status = 201
+        res.locals.status = 204
         next()
     } catch (error) {
         console.log(error)

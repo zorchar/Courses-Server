@@ -8,10 +8,10 @@ const absenceController = require('../controllers/absenceController')
 const router = new express.Router()
 
 // get - /
-router.put('/get-reason', authStudent, absenceController.getReasonFromAbsence)
+router.post('/get-reason', authStudent, absenceController.getReasonFromAbsence)
 
 // get - /courses/:courseID?date=
-router.put('/get-absences-course-and-date', authProfessor, absenceController.getAbsencesOfDateAndCourse)
+router.post('/get-absences-course-and-date', authProfessor, absenceController.getAbsencesOfDateAndCourse)
 
 router.patch('/:absenceId/add-reason', authStudent, absenceController.addReasonToAbsence)
 
