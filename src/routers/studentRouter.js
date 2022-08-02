@@ -5,20 +5,16 @@ const authStudent = require('../middleware/authStudent')
 
 const router = new express.Router()
 
-router.post('/signin', studentController.signInStudent)
+router.get('/', authProfessor, studentController.getAllStudents)
 
-router.post('/create', authProfessor, studentController.createStudent)
+router.post('/login', studentController.loginStudent)
 
-router.get('/', studentController.getAllStudents)
+router.post('/new', authProfessor, studentController.createStudent)
 
-router.get('/:studentId', authProfessor, studentController.getStudent)
-
-router.delete('/:studentId', authProfessor, studentController.deleteStudent)
+router.route('/:studentId')
+    .get(authProfessor, studentController.getStudent)
+    .delete(authProfessor, studentController.deleteStudent)
 
 router.patch('/me', authStudent, studentController.patchStudent)
-
-router.patch('/register', authProfessor, studentController.registerForCourse)
-
-router.patch('/unregister', authProfessor, studentController.removeFromCourse)
 
 module.exports = router

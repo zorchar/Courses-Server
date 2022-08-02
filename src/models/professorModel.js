@@ -68,18 +68,18 @@ professorSchema.pre('save', async function (next) {
     next()
 })
 
-professorSchema.statics.findProfessorByEmailAndPassword = async (email, password) => {
+professorSchema.statics.findByEmailAndPassword = async (email, password) => {
     const professor = await Professor.findOne({ email })
     if (!professor) {
         const err = new Error('Unable to login.')
-        err.status = 400
+        err.status = 401
         throw err
     }
 
     const isPassMatch = await bcrypt.compare(password, professor.password)
     if (!isPassMatch) {
         const err = new Error('Unable to login.')
-        err.status = 400
+        err.status = 401
         throw err
     }
 

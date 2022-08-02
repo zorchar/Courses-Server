@@ -74,18 +74,18 @@ studentSchema.pre('save', async function (next) {
     next()
 })
 
-studentSchema.statics.findStudentByEmailAndPassword = async (email, password) => {
+studentSchema.statics.findByEmailAndPassword = async (email, password) => {
     const student = await Student.findOne({ email })
     if (!student) {
         const err = new Error('Unable to login.')
-        err.status = 400
+        err.status = 401
         throw err
     }
 
     const isPassMatch = await bcrypt.compare(password, student.password)
     if (!isPassMatch) {
         const err = new Error('Unable to login.')
-        err.status = 400
+        err.status = 401
         throw err
     }
 
@@ -118,6 +118,7 @@ studentSchema.methods.toJSON = function () {
 
     return studentObj
 }
+studentSchema.index({ firstName: 1 });
 
 const Student = mongoose.model("Student", studentSchema)
 

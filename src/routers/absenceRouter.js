@@ -1,14 +1,19 @@
 const express = require('express')
-const absenceController = require('../controllers/absenceController')
+
 const authProfessor = require('../middleware/authProfessor')
 const authStudent = require('../middleware/authStudent')
 
+const absenceController = require('../controllers/absenceController')
+
 const router = new express.Router()
 
-router.patch('/add-reason', authStudent, absenceController.addReasonToAbsence)
+// get - /
+router.put('/get-reason', authStudent, absenceController.getReasonFromAbsence)
 
-router.put('/get-reason', absenceController.getReasonFromAbsence)
+// get - /courses/:courseID?date=
+router.put('/get-absences-course-and-date', authProfessor, absenceController.getAbsencesOfDateAndCourse)
 
-router.put('/get-absences-course-and-date', absenceController.getAbsencesOfDateAndCourse)
+router.patch('/:absenceId/add-reason', authStudent, absenceController.addReasonToAbsence)
+
 
 module.exports = router

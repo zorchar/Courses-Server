@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "env-cmd -f ./config/dev.env nodemon ./src/server.js -e js",
-    "sass": "sass ./public/styles/scss/styles.scss:./public/styles/css/styles.css --watch --no-source-map"
+    "dev": "env-cmd -f ./config/dev.env nodemon ./src/index.js -e js"
   },
   "author": "",
   "license": "ISC",

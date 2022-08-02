@@ -1,8 +1,8 @@
-const errorHandlerMiddleware = (error, req, res, next) => {
-    res.status(500).send({
-        status: 500,
-        message: error.message
+const errorHandlerMiddleware = (err, req, res, next) => {
+    res.status(err.status || 500).send({
+        status: err.status || 500,
+        message: err.message
     })
-};
+}
 
-module.exports = errorHandlerMiddleware;
+module.exports = errorHandlerMiddleware

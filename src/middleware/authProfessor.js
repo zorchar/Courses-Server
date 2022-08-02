@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+
 const Professor = require('../models/professorModel')
 
 const authProfessor = async (req, res, next) => {
@@ -7,17 +8,17 @@ const authProfessor = async (req, res, next) => {
         const data = jwt.verify(token, process.env.SECRET)
         const professor = await Professor.findOne(
             {
-
                 _id: data._id,
                 'tokens.token': token
             }
         )
 
         if (!professor) {
-            const err = new Error("No professor found")
+            const err = new Error("Unable to login")
             err.status = 401
             throw err
         }
+
         req.token = token
         req.professor = professor
         return next()
@@ -25,7 +26,6 @@ const authProfessor = async (req, res, next) => {
     } catch (error) {
         error.status = 401
         error.message = 'no authentication'
-        console.log(error)
         return next(error)
     }
 }

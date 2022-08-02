@@ -31,14 +31,14 @@ const absenceSchema = new mongoose.Schema(
     },
 )
 
+absenceSchema.index({ student: 1, course: 1 });
+
 absenceSchema.methods.toJSON = function () {
     const absence = this
     const absenceObj = absence.toObject()
-    /// maybe keep?
     delete absenceObj.createdAt
     delete absenceObj.updatedAt
     delete absenceObj.__v
-    // delete absenceObj._id
 
     return absenceObj
 }

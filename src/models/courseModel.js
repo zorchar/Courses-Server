@@ -37,11 +37,9 @@ const courseSchema = new mongoose.Schema(
 courseSchema.methods.toJSON = function () {
     const course = this
     const courseObj = course.toObject()
-    /// maybe keep?
     delete courseObj.createdAt
     delete courseObj.updatedAt
     delete courseObj.__v
-    // delete courseObj._id
 
     return courseObj
 }
